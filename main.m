@@ -1,16 +1,32 @@
+% MAIN
+% Entry point for the multi-objective DE irrigation optimization demo.
+%
+% UNITS AND OUTPUTS
+% - Decision variable x: daily irrigation depth (mm/day)
+% - Objective 1: negative crop yield (-kg/ha)
+% - Objective 2: straw biomass (kg/ha)
+% - Objective 3: total seasonal irrigation (mm)
+%
+% WORKFLOW
+% 1. Load demo weather data
+% 2. Initialize the population
+% 3. Evaluate the initial population
+% 4. Run DE iterations
+% 5. Extract the Pareto front using non-dominated sorting
+
 clc; clear; close all;
 addpath(genpath(pwd));
 
 params = params_demo();
 load('demo_weather.mat', 'weather');
 
-% 初始化
+% Initialize population
 population = initialization(params.popSize, params);
 
-% 初始评价
+% Evaluate initial population
 objectives = objective_wrapper(population, params, weather);
 
-% 主循环
+% Main optimization loop
 for gen = 1:params.maxGen
     [population, objectives] = DE_main(population, objectives, params, weather);
 
@@ -20,7 +36,7 @@ for gen = 1:params.maxGen
     fprintf('Generation %d completed. Pareto size = %d\n', gen, paretoSize);
 end
 
-% 提取 Pareto 前沿
+% Extract Pareto front
 [FrontNo, ~] = NDSort(objectives, inf);
 paretoIdx = (FrontNo == 1);
 paretoSolutions = population(paretoIdx);

@@ -1,5 +1,15 @@
 function create_demo_weather()
-% Create demo_weather.mat for the project.
+% CREATE_DEMO_WEATHER
+% Generate a demo weather file for the irrigation optimization and crop model demos.
+%
+% UNITS
+% - Temp: °C
+% - RN  : MJ/m^2/day
+% - EP  : mm/day
+% - ET0 : mm/day
+%
+% OUTPUT
+% - demo_weather.mat containing the struct "weather"
 
 GPL = 120;
 t = (1:GPL)';
