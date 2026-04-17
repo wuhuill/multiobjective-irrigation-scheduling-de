@@ -48,28 +48,28 @@ function [results] = run_crop_model(weather, irrigation, params)
     IQ   = irrigation(:);
     GPL  = length(Temp);
 
-    %% Ԥ����
+    %% Preallocation
     theta = zeros(GPL,1);
     ETa   = zeros(GPL,1);
     Ksw   = zeros(GPL,1);
     LAI   = zeros(GPL,1);
     Bio   = zeros(GPL,1);
 
-    %% ����
+    %%  Root depth
     Root = zeros(GPL,1);
     for t = 1:GPL
         Root(t) = Crop_Root(t, params.torigin, params.tiending, ...
                             params.Rootorigin, params.Rootending);
     end
 
-    %% �ȵ�Ԫָ�� HUI�����Ʋ�����1��
+    %% Heat unit index HUI (limited to a maximum of 1)
     HU = max(0, Temp - params.Tb);
     HUI = cumsum(HU) / params.PHU;
-    HUI = min(HUI, 1);   % �ؼ����������Ϊ1
+    HUI = min(HUI, 1);    % Ensure HUI does not exceed 1?1
 
-    %% ����ѭ��
+    %% Daily loop
     for t = 1:GPL
-        % ˮ��в��ϵ��
+        % Water stress coefficient
         if t == 1
             theta_prev = params.theta0;
         else
@@ -77,12 +77,12 @@ function [results] = run_crop_model(weather, irrigation, params)
         end
         Ksw(t) = Crop_Ksw(params.fieldcapacity, params.wilting, theta_prev);
 
-        % �¶�в��ϵ��
+        % Temperature stress coefficient
         KTS = max(0, sin(pi/2 * (Temp(t) - params.Tb) / (params.TO - params.Tb)));
         REG = min(KTS, Ksw(t));
         REG = max(0, REG);   % ȷ���Ǹ�
 
-        % Ҷ���ָ�� LAI
+        % Leaf area index LAI
         HUF = max(0, HUI(t) / (HUI(t) + exp(params.ab1 - params.ab2 * HUI(t))));
         if t == 1
             delta_HUF = HUF;
@@ -92,15 +92,15 @@ function [results] = run_crop_model(weather, irrigation, params)
         else
             delta_HUF = max(0, HUF - HUF_prev);
             if HUI(t) < params.HUI0
-                % �����׶Σ���ֹ�������¸���
-                LAI_prev = min(LAI(t-1), params.LAImax);   % ����ǰһʱ�̲�����LAImax
+                % Growth phase: prevent overshoot and negative values
+                LAI_prev = min(LAI(t-1), params.LAImax);   % Limit previous LAI to LAImax
                 exp_term = exp(5 * (LAI_prev - params.LAImax));
                 inc = delta_HUF * params.LAImax * (1 - exp_term) * sqrt(REG);
                 LAI(t) = LAI(t-1) + inc;
                 LAI(t) = max(0, min(params.LAImax, LAI(t)));
                 LAI_max_act = max(LAI_max_act, LAI(t));
             else
-                % �½��׶Σ���ֹ����Ϊ��
+                % Decline phase: avoid negative base values
                 ratio = (1 - HUI(t)) / (1 - params.HUI0);
                 ratio = max(0, ratio);   % �ؼ���ȷ���Ǹ�
                 LAI(t) = LAI_max_act * (ratio ^ params.ad);
@@ -109,7 +109,7 @@ function [results] = run_crop_model(weather, irrigation, params)
         end
         HUF_prev = HUF;
 
-        % �����Ч���� PAR ������������
+        % Photosynthetically active radiation (PAR) and biomass increment
         PAR = 0.5 * RN(t) * (1 - exp(-0.65 * LAI(t)));
         delta_Bio = params.BE * PAR * REG;
         if t == 1
@@ -118,7 +118,7 @@ function [results] = run_crop_model(weather, irrigation, params)
             Bio(t) = Bio(t-1) + delta_Bio;
         end
 
-        % ʵ����ɢ��
+        % Actual evapotranspiration
         if isempty(params.Kc)
             Kc_t = 1.0;
         else
@@ -126,7 +126,7 @@ function [results] = run_crop_model(weather, irrigation, params)
         end
         ETa(t) = Kc_t * Ksw(t) * ET0(t);
 
-        % ����ˮ��ƽ��
+        % Soil water balance
         if t == 1
             [theta(t), ~] = Soil_Water(theta_prev, EP(t), IQ(t), ETa(t), ...
                 Root(t), Root(t), params.fieldcapacity, params.theta0);
@@ -136,11 +136,11 @@ function [results] = run_crop_model(weather, irrigation, params)
         end
     end
 
-    %% ���ղ����ͽո�
+    %% Final yield and straw biomass
     Yield = params.HI * Bio(end);
     Straw = 0.9 * (Bio(end) - Yield);
 
-    %% ������
+    %% Package outputs
     results.theta = theta;
     results.ETa   = ETa;
     results.Bio   = Bio;
@@ -151,7 +151,7 @@ function [results] = run_crop_model(weather, irrigation, params)
 end
 
 % -------------------------------------------------------------------------
-% �Ӻ�����Crop_Ksw, Crop_Root, Soil_Water ��ԭ��ͬ���ԣ�
+% Subfunctions (Crop_Ksw, Crop_Root, Soil_Water remain unchanged)
 function Kswi = Crop_Ksw(fieldcapacity, wilting, theta)
     if theta >= 0.9 * fieldcapacity
         Kswi = 1;
