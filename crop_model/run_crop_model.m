@@ -40,7 +40,6 @@ function [results] = run_crop_model(weather, irrigation, params)
 % - results.LAI   : daily leaf area index (unitless)
 
 
-    %% ��ȡ��������
     Temp = weather.Temp(:);
     RN   = weather.RN(:);
     EP   = weather.EP(:);
@@ -87,7 +86,7 @@ function [results] = run_crop_model(weather, irrigation, params)
         if t == 1
             delta_HUF = HUF;
             LAI(t) = delta_HUF * params.LAImax * (1 - exp(-5 * params.LAImax)) * sqrt(REG);
-            LAI(t) = max(0, min(params.LAImax, LAI(t)));   % ���Ʒ�Χ
+            LAI(t) = max(0, min(params.LAImax, LAI(t)));    % Restrict to valid range
             LAI_max_act = LAI(t);
         else
             delta_HUF = max(0, HUF - HUF_prev);
@@ -102,7 +101,7 @@ function [results] = run_crop_model(weather, irrigation, params)
             else
                 % Decline phase: avoid negative base values
                 ratio = (1 - HUI(t)) / (1 - params.HUI0);
-                ratio = max(0, ratio);   % �ؼ���ȷ���Ǹ�
+                ratio = max(0, ratio);   % Ensure non-negativity
                 LAI(t) = LAI_max_act * (ratio ^ params.ad);
                 LAI(t) = max(0, min(params.LAImax, LAI(t)));
             end
