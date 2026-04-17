@@ -1,6 +1,23 @@
 function [population, objectives] = selection_DE(population, trialPopulation, objectives, trialObjectives)
-% Combine parent and trial populations, then keep the best N using
-% non-dominated sorting + crowding distance.
+% SELECTION_DE
+% Select the next generation using non-dominated sorting and crowding distance.
+%
+% INPUT
+%   population       : current parent population
+%   trialPopulation   : trial population
+%   objectives       : objective matrix of parent population
+%                      size = [N x 3]
+%   trialObjectives  : objective matrix of trial population
+%                      size = [N x 3]
+%
+% OUTPUT
+%   population       : selected population for the next generation
+%   objectives       : selected objective matrix
+%
+% NOTES
+%   - All objectives are minimized.
+%   - Pareto front ranking is based on non-dominated sorting.
+%   - Crowding distance is used to preserve diversity..
 
 combinedPopulation = [population; trialPopulation];
 combinedObjectives = [objectives; trialObjectives];

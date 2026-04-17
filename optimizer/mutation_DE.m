@@ -1,5 +1,18 @@
 function mutants = mutation_DE(population, params, F)
-% DE/rand/1 mutation for continuous decision vectors.
+% MUTATION_DE
+% Perform DE/rand/1 mutation on the population.
+%
+% INPUT
+%   population : parent population (struct array)
+%   params     : parameter structure
+%   F          : differential weight (unitless)
+%
+% OUTPUT
+%   mutants    : mutated population (struct array)
+%
+% NOTES
+%   - Decision variables are daily irrigation depth values (mm/day).
+%   - Bound handling is applied after mutation.
 
 N = numel(population);
 mutants = population;

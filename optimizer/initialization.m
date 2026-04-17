@@ -1,6 +1,17 @@
 function population = initialization(popSize, params)
-% Initialize a population of continuous irrigation schedules.
-% Each individual is a struct with field x (1 x dim).
+% INITIALIZATION
+% Create the initial population for the DE optimizer.
+%
+% INPUT
+%   params.popSize         : population size (unitless)
+%   params.dim             : number of decision variables (unitless)
+%   params.irrigationLower : lower bound of daily irrigation depth (mm/day)
+%   params.irrigationUpper : upper bound of daily irrigation depth (mm/day)
+%
+% OUTPUT
+%   population : struct array with field x
+%                x = decision vector representing daily irrigation depth
+%                    (mm/day)
 
 population = repmat(struct('x', []), popSize, 1);
 

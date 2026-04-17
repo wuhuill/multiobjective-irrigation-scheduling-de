@@ -1,10 +1,20 @@
 function objectives = objective_wrapper(population, params, weather)
-% 3 objectives, all minimized:
-%   f1 = -Yield
-%   f2 = Straw
-%   f3 = total irrigation
+% OBJECTIVE_WRAPPER
+% Evaluate the whole population using the crop growth model.
 %
-% Penalty is added uniformly to all objectives.
+% UNITS AND OBJECTIVES
+% - x: daily irrigation depth (mm/day)
+% - Yield returned by run_crop_model: kg/ha
+% - Straw returned by run_crop_model: kg/ha
+% - Seasonal irrigation: mm
+%
+% OBJECTIVES (all minimized)
+% - f1 = -Yield (kg/ha)
+% - f2 = Straw (kg/ha)
+% - f3 = total irrigation (mm)
+%
+% CONSTRAINT HANDLING
+% A penalty vector is added to all objectives when constraints are violated.
 
 N = numel(population);
 objectives = zeros(N, 3);

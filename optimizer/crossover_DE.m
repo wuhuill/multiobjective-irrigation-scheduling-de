@@ -1,5 +1,19 @@
 function trialPopulation = crossover_DE(population, mutants, params, CR)
-% Binomial crossover.
+% CROSSOVER_DE
+% Perform binomial crossover between target and mutant vectors.
+%
+% INPUT
+%   population : parent population (struct array)
+%   mutants    : mutated population (struct array)
+%   params     : parameter structure
+%   CR         : crossover rate (unitless, between 0 and 1)
+%
+% OUTPUT
+%   trialPopulation : trial population after crossover
+%
+% NOTES
+%   - Decision variables are daily irrigation depth values (mm/day).
+%   - At least one variable is guaranteed to come from the mutant vector.
 
 N = numel(population);
 trialPopulation = population;

@@ -1,6 +1,18 @@
 function [FrontNo, CrowdDis] = NDSort(PopObj, ~)
-% Simple non-dominated sorting with crowding distance.
-% Minimization assumed.
+% NDSORT
+% Perform non-dominated sorting and crowding distance calculation.
+%
+% INPUT
+%   PopObj : objective matrix, size = [N x M]
+%            all objectives are assumed to be minimized
+%
+% OUTPUT
+%   FrontNo  : non-dominated rank of each individual
+%   CrowdDis : crowding distance of each individual
+%
+% NOTES
+%   - FrontNo = 1 corresponds to the first Pareto front.
+%   - CrowdDis is used to keep diversity within the same front.
 
 [N, M] = size(PopObj);
 
