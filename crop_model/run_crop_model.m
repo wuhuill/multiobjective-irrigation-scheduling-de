@@ -151,7 +151,7 @@ function [results] = run_crop_model(weather, irrigation, params)
 end
 
 % -------------------------------------------------------------------------
-% Subfunctions (Crop_Ksw, Crop_Root, Soil_Water remain unchanged)
+% Subfunctions (Crop_Ksw, Crop_Root, Soil_Water)
 function Kswi = Crop_Ksw(fieldcapacity, wilting, theta)
     if theta >= 0.9 * fieldcapacity
         Kswi = 1;
